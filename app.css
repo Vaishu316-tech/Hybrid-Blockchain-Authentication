@@ -1,0 +1,118 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    padding: 20px;
+    color: #38bdf8;
+}
+
+.container {
+    width: 85%;
+    margin: auto;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px #38bdf8;
+}
+
+input, select {
+    padding: 10px;
+    margin: 8px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+}
+
+button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #38bdf8;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #0ea5e9;
+}
+
+p {
+    margin-top: 10px;
+    font-weight: bold;
+}
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+#statusBox {
+    background: #14532d;
+    color: #4ade80;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+#web3Result {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+}
+
+#web3Result a {
+    color: #38bdf8;
+    text-decoration: none;
+}
+
+#web3Result a:hover {
+    text-decoration: underline;
+}
+.dashboard {
+    margin-top: 20px;
+}
+
+.stats {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#blockchainView {
+    margin-top: 20px;
+}
+
+#blockList div {
+    color: #e2e8f0;
+    font-size: 14px;
+}

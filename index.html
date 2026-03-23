@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hybrid Blockchain-Based Identity Authentication Scheme</title>
+
+<style>
+body{
+margin:0;
+font-family:'Segoe UI';
+background:#0f172a;
+color:white;
+overflow-x:hidden;
+}
+#bgCanvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+h1{
+text-align:center;
+padding:20px;
+color:#38bdf8;
+}
+.container{
+width:85%;
+margin:auto;
+}
+.card{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:20px;
+margin:20px 0;
+border-radius:12px;
+}
+input,select{
+padding:8px;
+margin:8px;
+border-radius:6px;
+border:none;
+}
+button{
+padding:8px 14px;
+border:none;
+border-radius:6px;
+background:#38bdf8;
+cursor:pointer;
+transition:0.3s;
+}
+button:hover{
+background:#0ea5e9;
+}
+
+/* BLOCK UI */
+.block{
+background:#1e293b;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+animation:fadeIn 0.5s ease-in;
+}
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+#blockchainSection{
+display:none;
+}
+</style>
+</head>
+
+<body>
+<canvas id="bgCanvas"></canvas>
+<h1>Hybrid Blockchain-Based Identity Authentication Scheme</h1>
+
+<div class="container">
+
+<!-- REGISTER -->
+<div class="card">
+<h3>Register Node</h3>
+<input id="node_id" placeholder="Node ID">
+<select id="wsn">
+<option value="1">WSN-1</option>
+<option value="2">WSN-2</option>
+</select>
+
+<button onclick="registerNode()">Mine & Register</button>
+<button onclick="tamperChain()">Tamper</button>
+
+<div id="result"></div>
+</div>
+
+<!-- AUTH -->
+<div class="card">
+<h3>Authenticate Node</h3>
+<input id="auth_node_id" placeholder="Node ID">
+<select id="auth_wsn">
+<option value="1">WSN-1</option>
+<option value="2">WSN-2</option>
+</select>
+<button onclick="authenticateNode()">Authenticate</button>
+<div id="authResult"></div>
+</div>
+
+<!-- BLOCKCHAIN -->
+<div class="card">
+<h3>Blockchain</h3>
+<button onclick="showBlockchain()">View Blockchain</button>
+<button onclick="hideBlockchain()">Hide</button>
+
+<div id="blockchainSection">
+<div id="blockchainView"></div>
+</div>
+</div>
+
+<!-- WEB3 -->
+<div class="card">
+<h3>🌐 Web3 (MetaMask)</h3>
+<button onclick="connectWallet()">Connect Wallet</button>
+<p id="walletAddress"></p>
+</div>
+
+</div>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+
+<script>
+
+    
+// ================= BACKGROUND ANIMATION =================
+window.onload = function () {
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+
+    for (let i = 0; i < 80; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            dx: (Math.random() - 0.5),
+            dy: (Math.random() - 0.5),
+            radius: 2
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let p of particles) {
+            p.x += p.dx;
+            p.y += p.dy;
+
+            if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = "#38bdf8";
+            ctx.fill();
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+};
+
+
+// ---------- REGISTER ----------
+async function registerNode(){
+const node_id=document.getElementById("node_id").value;
+const wsn=document.getElementById("wsn").value;
+
+// 🔥 difficulty fixed to 2
+const difficulty=2;
+
+const res=await fetch("/register",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({node_id,wsn,difficulty})
+});
+const data=await res.json();
+
+document.getElementById("result").innerHTML=
+`<p>✅ Node Registered</p>
+<p>🔗 Hash: ${data.hash}</p>`;
+}
+
+// ---------- AUTH ----------
+async function authenticateNode(){
+const node_id=document.getElementById("auth_node_id").value;
+const wsn=document.getElementById("auth_wsn").value;
+
+const res=await fetch("/authenticate",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({node_id,wsn})
+});
+const data=await res.json();
+
+document.getElementById("authResult").innerHTML=
+`<p>${data.message}</p>`;
+}
+
+// ---------- BLOCKCHAIN ----------
+function showBlockchain(){
+document.getElementById("blockchainSection").style.display="block";
+loadBlockchain();
+}
+function hideBlockchain(){
+document.getElementById("blockchainSection").style.display="none";
+}
+
+async function loadBlockchain(){
+const res=await fetch("/blockchain");
+const data=await res.json();
+
+let html="";
+
+data.wsn1.forEach(b=>{
+html+=`
+<div class="block">
+🔢 <b>Index:</b> ${b.index} <br>
+📦 <b>Data:</b> ${b.data} <br>
+🔗 <b>Hash:</b> ${b.hash}
+</div>`;
+});
+
+document.getElementById("blockchainView").innerHTML=html;
+}
+
+// ---------- TAMPER ----------
+async function tamperChain(){
+await fetch("/tamper",{method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({wsn:"1"})});
+alert("Tampered!");
+}
+
+// ---------- METAMASK ----------
+let provider, signer;
+
+async function connectWallet() {
+    try {
+        // Step 1: Check MetaMask
+        if (!window.ethereum) {
+            alert("❌ MetaMask not installed");
+            return;
+        }
+
+        // Step 2: Request account access (THIS triggers popup)
+        const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts"
+        });
+
+        // Step 3: Show connected address
+        document.getElementById("walletAddress").innerText =
+            "✅ Connected: " + accounts[0];
+
+    } catch (error) {
+        console.error(error);
+
+        if (error.code === 4001) {
+            alert("❌ You rejected connection");
+        } else {
+            alert("❌ Connection Failed");
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>
